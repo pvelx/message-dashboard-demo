@@ -13,12 +13,14 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
     "quasar": "^1.0.0",
+    "vue": "latest",
     "vue-axios": "^3.2.0",
-    "vuex": "latest",
-    "vue": "latest"
+    "vuex": "latest"
   },
   "devDependencies": {
-    "@quasar/app": "^1.0.0"
+    "@quasar/app": "^1.0.0",
+    "vue-loader": "^15.9.5",
+    "vue-template-compiler": "^2.6.12"
   },
   "engines": {
     "node": ">= 10.18.1",
