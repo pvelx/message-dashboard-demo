@@ -9,13 +9,12 @@
           <q-card-section class="q-pa-sm row">
             <q-item class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
               <q-item-section>
-                Body message
+                Message body
               </q-item-section>
             </q-item>
             <q-item class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
               <q-item-section>
-                <q-input :maxlength='255' type="textarea" dense outlined round v-model="message"
-                         label="Message"/>
+                <q-input :maxlength='255' type="textarea" dense outlined round v-model="newMessage.text" label="Text"/>
               </q-item-section>
             </q-item>
             <q-item class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
@@ -25,8 +24,7 @@
             </q-item>
             <q-item class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
               <q-item-section>
-                <q-input type="email" dense outlined round v-model="email"
-                         label="Email"/>
+                <q-input type="email" dense outlined round v-model="newMessage.email" label="Email"/>
               </q-item-section>
             </q-item>
             <q-item class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
@@ -36,13 +34,13 @@
             </q-item>
             <q-item class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
               <q-item-section>
-                <q-input dense outlined round v-model="date">
+                <q-input dense outlined round v-model="newMessage.time">
                   <template v-slot:prepend>
                     <q-icon name="event" class="cursor-pointer">
                       <q-popup-proxy transition-show="scale" transition-hide="scale">
-                        <q-date v-model="date" mask="YYYY-MM-DD HH:mm">
+                        <q-date v-model="newMessage.time" mask="YYYY-MM-DD HH:mm">
                           <div class="row items-center justify-end">
-                            <q-btn v-close-popup label="Close" color="primary" flat />
+                            <q-btn v-close-popup label="Close" color="primary" flat/>
                           </div>
                         </q-date>
                       </q-popup-proxy>
@@ -51,9 +49,9 @@
                   <template v-slot:append>
                     <q-icon name="access_time" class="cursor-pointer">
                       <q-popup-proxy transition-show="scale" transition-hide="scale">
-                        <q-time v-model="date" mask="YYYY-MM-DD HH:mm" format24h>
+                        <q-time v-model="newMessage.time" mask="YYYY-MM-DD HH:mm:ss" format24h>
                           <div class="row items-center justify-end">
-                            <q-btn v-close-popup label="Close" color="primary" flat />
+                            <q-btn v-close-popup label="Close" color="primary" flat/>
                           </div>
                         </q-time>
                       </q-popup-proxy>
@@ -64,7 +62,7 @@
             </q-item>
           </q-card-section>
           <q-card-actions align="right">
-            <q-btn class="text-capitalize">Save</q-btn>
+            <q-btn @click="schedule" class="text-capitalize">Save</q-btn>
           </q-card-actions>
         </q-card>
       </div>
@@ -73,14 +71,40 @@
 </template>
 
 <script>
+    import {SCHEDULE_MESSAGE} from "../store/actions.type";
+
     export default {
         name: "ScheduleMessage",
         data() {
             return {
-                message: '',
-                email: '',
-                date: '2019-02-01 12:44',
+                newMessage: {
+                    text: '',
+                    email: '',
+                    time: '',
+                },
+                inProgress: false,
+                errors: {}
             }
+        },
+        methods: {
+            schedule() {
+                this.inProgress = true;
+                this.$store
+                    .dispatch(SCHEDULE_MESSAGE, {
+                        exec_time: this.newMessage.time,
+                        text: this.newMessage.text,
+                        email: this.newMessage.email
+                    })
+                    .then(({data}) => {
+                        this.inProgress = false;
+                        this.newMessage = {exec_time: '', text: '', email: ''}
+                        this.$router.push({path: '/'});
+                    })
+                    .catch(({response}) => {
+                        this.inProgress = false;
+                        this.errors = response.data.errors;
+                    });
+            },
         }
     }
 </script>
