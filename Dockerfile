@@ -14,7 +14,7 @@ COPY . .
 
 RUN quasar build
 
-FROM nginx:1.17.0-alpine
+FROM nginx:1.19.6-alpine
 RUN rm /usr/share/nginx/html/*
 COPY  --from=ui-builder /app/dist/spa /usr/share/nginx/html
 
