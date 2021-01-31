@@ -1,2 +1,2 @@
-export const API_URL = process.env.VUE_APP_BACKEND_URL
+export const API_URL = '{{ API_URL }}'
 export default API_URL;
