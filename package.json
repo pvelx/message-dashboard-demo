@@ -12,7 +12,10 @@
   "dependencies": {
     "@quasar/extras": "^1.0.0",
     "axios": "^0.18.1",
+    "dateformat": "^4.5.1",
+    "lorem-ipsum": "^2.0.3",
     "quasar": "^1.0.0",
+    "truncate": "^2.1.0",
     "vue": "latest",
     "vue-axios": "^3.2.0",
     "vuex": "latest"

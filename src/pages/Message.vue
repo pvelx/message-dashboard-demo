@@ -12,16 +12,17 @@
         <div class="col-7 q-pr-md">
           <q-card>
             <q-card-section>
-              <div class="text-h6 text-grey-8">
+              <span class="text-h6 text-grey-8">
                 List
-                <q-btn @click="reloadMessages" dense round class="float-right" icon="cached"/>
-              </div>
+              </span>
+              <q-btn @click="reloadMessages" dense round class="float-right" icon="cached"/>
             </q-card-section>
             <q-card-section class="q-pa-none">
               <q-table
                 :data="messages"
                 :columns="columns"
                 row-key="name"
+                :pagination="initialPagination"
               >
                 <template v-slot:body-cell-status="props">
                   <q-td key="status" :props="props">
@@ -45,10 +46,21 @@
         </div>
         <div class="col-5 ">
           <q-card class="card">
-            <q-card-section class="text-h6  text-grey-8">
-              <div class="text-h6">New</div>
+            <q-card-section>
+              <span class="text-h6 text-grey-8">New</span>
+              <q-btn @click="resetForm" dense round class="float-right" icon="cached"/>
             </q-card-section>
             <q-card-section class="q-pa-sm row">
+              <q-item class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
+                <q-item-section>
+                  Recipient
+                </q-item-section>
+              </q-item>
+              <q-item class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
+                <q-item-section>
+                  <q-input type="email" dense outlined round v-model="newMessage.email" label="Email"/>
+                </q-item-section>
+              </q-item>
               <q-item class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <q-item-section>
                   Message body
@@ -62,16 +74,6 @@
               </q-item>
               <q-item class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                 <q-item-section>
-                  Recipient
-                </q-item-section>
-              </q-item>
-              <q-item class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
-                <q-item-section>
-                  <q-input type="email" dense outlined round v-model="newMessage.email" label="Email"/>
-                </q-item-section>
-              </q-item>
-              <q-item class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
-                <q-item-section>
                   Scheduled sending
                 </q-item-section>
               </q-item>
@@ -81,7 +83,7 @@
                     <template v-slot:prepend>
                       <q-icon name="event" class="cursor-pointer">
                         <q-popup-proxy transition-show="scale" transition-hide="scale">
-                          <q-date v-model="newMessage.time" mask="YYYY-MM-DD HH:mm">
+                          <q-date v-model="newMessage.time" mask="YYYY-MM-DD HH:mm:ss">
                             <div class="row items-center justify-end">
                               <q-btn v-close-popup label="Close" color="primary" flat/>
                             </div>
@@ -92,7 +94,7 @@
                     <template v-slot:append>
                       <q-icon name="access_time" class="cursor-pointer">
                         <q-popup-proxy transition-show="scale" transition-hide="scale">
-                          <q-time v-model="newMessage.time" mask="YYYY-MM-DD HH:mm:ss" format24h>
+                          <q-time v-model="newMessage.time" mask="YYYY-MM-DD HH:mm:ss" with-seconds format24h>
                             <div class="row items-center justify-end">
                               <q-btn v-close-popup label="Close" color="primary" flat/>
                             </div>
@@ -118,11 +120,21 @@
     import store from "../store";
     import {CANCEL_SENDING_MESSAGE, FETCH_MESSAGES, SCHEDULE_MESSAGE} from "../store/actions.type";
     import {mapGetters} from "vuex";
+    import {LoremIpsum} from "lorem-ipsum";
+    import dateFormat from "dateformat";
+    import truncate from "truncate";
+
 
     export default {
         name: 'Message',
         data() {
             return {
+                lorem: new LoremIpsum({
+                    wordsPerSentence: {
+                        max: 16,
+                        min: 4
+                    }
+                }),
                 newMessage: {
                     text: '',
                     email: '',
@@ -130,11 +142,32 @@
                 },
                 inProgress: false,
                 errors: {},
+                initialPagination: {
+                    sortBy: 'id',
+                    descending: true,
+                    rowsPerPage: 10
+                },
                 columns: [
-                    {name: 'id', align: 'left', label: '#', field: 'id'},
-                    {name: 'message', align: 'left', label: 'Message', field: 'text', headerStyle: 'width: 50%'},
+                    {name: 'id', align: 'left', label: '#', field: 'id', sortable: true},
                     {name: 'status', label: 'Status', field: 'status', align: 'left'},
-                    {name: 'sendTime', label: 'Send time', field: 'exec_time', align: 'left'},
+                    {name: 'email', label: 'Email', field: 'email', align: 'left', sortable: true},
+                    {
+                        name: 'message',
+                        align: 'left',
+                        label: 'Message',
+                        field: 'text',
+                        headerStyle: 'width: 50%',
+                        format: (val, row) => {
+                            return truncate(val, 30)
+                        }
+                    },
+                    {
+                        name: 'sendTime',
+                        label: 'Send time',
+                        field: 'exec_time',
+                        align: 'left',
+                        sortable: true
+                    },
                     {name: 'Action', label: '', field: 'Action', headerStyle: 'width: 50px'}
                 ],
             }
@@ -149,7 +182,17 @@
                 next();
             });
         },
+        mounted() {
+            this.resetForm()
+        },
         methods: {
+            resetForm() {
+                this.newMessage = {
+                    time: dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss"),
+                    text: this.lorem.generateSentences(1),
+                    email: this.lorem.generateWords(1) + '@gmail.com'
+                };
+            },
             isCanceled(message) {
                 return message.status === 'canceled'
             },
@@ -169,7 +212,7 @@
                     })
                     .then(({data}) => {
                         this.inProgress = false;
-                        this.newMessage = {exec_time: '', text: '', email: ''}
+                        this.resetForm()
                         store.dispatch(FETCH_MESSAGES)
                     })
                     .catch(({response}) => {
