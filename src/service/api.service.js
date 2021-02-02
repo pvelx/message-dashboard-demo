@@ -9,8 +9,8 @@ const ApiService = {
     Vue.axios.defaults.baseURL = API_URL;
   },
 
-  get(resource, query = "") {
-    return Vue.axios.get(`${resource}/${query}`);
+  get(resource) {
+    return Vue.axios.get(`${resource}`);
   },
 
   post(resource, params) {
