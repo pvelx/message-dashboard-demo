@@ -1,11 +1,7 @@
 const routes = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {path: '', component: () => import('pages/MessageList.vue')},
-      {path: '/ScheduleMessage', component: () => import('pages/ScheduleMessage.vue')},
-    ]
+    component: () => import('pages/Message.vue'),
   },
 ]
 
