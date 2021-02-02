@@ -121,8 +121,8 @@
     import {CANCEL_SENDING_MESSAGE, FETCH_MESSAGES, SCHEDULE_MESSAGE} from "../store/actions.type";
     import {mapGetters} from "vuex";
     import {LoremIpsum} from "lorem-ipsum";
-    import dateFormat from "dateformat";
     import truncate from "truncate";
+    import moment from "moment";
 
 
     export default {
@@ -166,7 +166,10 @@
                         label: 'Send time',
                         field: 'exec_time',
                         align: 'left',
-                        sortable: true
+                        sortable: true,
+                        format: (val, row) => {
+                            return moment(val, 'X').format("YYYY-MM-DD HH:mm:ss")
+                        }
                     },
                     {name: 'Action', label: '', field: 'Action', headerStyle: 'width: 50px'}
                 ],
@@ -188,7 +191,7 @@
         methods: {
             resetForm() {
                 this.newMessage = {
-                    time: dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss"),
+                    time: moment().format("YYYY-MM-DD HH:mm:ss"),
                     text: this.lorem.generateSentences(1),
                     email: this.lorem.generateWords(1) + '@gmail.com'
                 };
@@ -206,7 +209,7 @@
                 this.inProgress = true;
                 this.$store
                     .dispatch(SCHEDULE_MESSAGE, {
-                        exec_time: this.newMessage.time,
+                        exec_time: moment(this.newMessage.time).unix(),
                         text: this.newMessage.text,
                         email: this.newMessage.email
                     })
