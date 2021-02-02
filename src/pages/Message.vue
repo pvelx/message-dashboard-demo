@@ -26,14 +26,14 @@
               >
                 <template v-slot:body-cell-status="props">
                   <q-td key="status" :props="props">
-                    <q-badge color="green">
+                    <q-badge :color="getBadgeColor(props.row.status)">
                       {{ props.row.status }}
                     </q-badge>
                   </q-td>
                 </template>
                 <template v-slot:body-cell-Action="props">
                   <q-td
-                    :disabled="isCanceled(props.row)"
+                    :disabled="isPending(props.row)"
                     :props="props"
                   >
                     <q-btn @click="()=>{cancelSending(props.row.id)}" icon="cancel" size="sm" class="q-ml-sm" flat
@@ -196,14 +196,24 @@
                     email: this.lorem.generateWords(1) + '@gmail.com'
                 };
             },
-            isCanceled(message) {
-                return message.status === 'canceled'
+            isPending(message) {
+                return message.status !== 'pending'
             },
             reloadMessages() {
                 store.dispatch(FETCH_MESSAGES)
             },
             cancelSending(id) {
                 store.dispatch(CANCEL_SENDING_MESSAGE, id)
+            },
+            getBadgeColor(status) {
+                switch (status) {
+                    case 'pending':
+                        return 'orange';
+                    case 'shipped':
+                        return 'green';
+                    case 'canceled':
+                        return 'red';
+                }
             },
             schedule() {
                 this.inProgress = true;
