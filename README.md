@@ -1,19 +1,11 @@
-## Install the dependencies
-```bash
-npm install
-```
+Микросервис является частью приложения [Message](https://github.com/pvelx/k8s-message-demo).
+---
 
-### Start the app in development mode
-```bash
-quasar dev
-```
+Панель администратора для управления отложенной отправкой сообщений. Написан на базе фреймворка Vue.
 
+![Scheme](./screen.png)
 
-### Build the app for production
-```bash
-quasar build
-```
+### License
 
-## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
-[MIT](http://opensource.org/licenses/MIT)
