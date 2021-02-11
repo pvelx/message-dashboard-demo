@@ -1,7 +1,7 @@
-Микросервис является частью приложения [Message](https://github.com/pvelx/k8s-message-demo).
+The microservice is part of the application [Message](https://github.com/pvelx/k8s-message-demo).
 ---
 
-Панель администратора для управления отложенной отправкой сообщений. Написан на базе фреймворка Vue.
+Admin panel for managing deferred message sending. It is written on the basis of the Vue framework.
 
 ![Scheme](./screen.png)
 
